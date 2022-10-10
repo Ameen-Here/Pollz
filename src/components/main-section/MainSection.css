@@ -40,7 +40,7 @@
   cursor: pointer;
   line-height: 20px;
   display: inline-block;
-  color: #666;
+  color: rgb(75, 75, 75);
 }
 [type="radio"]:checked + label:before,
 [type="radio"]:not(:checked) + label:before {
@@ -99,4 +99,11 @@
   box-shadow: 5px 5px 5px #eee;
   text-shadow: none;
   cursor: pointer;
+}
+
+/* Input Field */
+.card__input {
+  border-radius: 4px;
+  padding: 5px;
+  width: 200px;
 }
