@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Homepage from "./homepage/Homepage";
 
 import "./MainSection.css";
-import StudentHomepage from "./student/StudentHomepage";
+import Student from "./student/Student";
 import TeacherHomepage from "./teacher/TeacherHomepage";
 
 const MainSection = () => {
@@ -20,7 +20,7 @@ const MainSection = () => {
       {currentPage === "homepage" && (
         <Homepage selectUser={selectUserHandler} />
       )}
-      {currentPage === "student" && <StudentHomepage />}
+      {currentPage === "student" && <Student />}
       {currentPage === "teacher" && <TeacherHomepage />}
     </main>
   );
