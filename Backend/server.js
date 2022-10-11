@@ -49,6 +49,7 @@ io.on("connection", (socket) => {
     options = optionVal;
     io.emit("getPoll", options);
     io.emit("updateQuestion", questionOption);
+    // io.emit("voteCompleted", false);
   });
 
   // On new user

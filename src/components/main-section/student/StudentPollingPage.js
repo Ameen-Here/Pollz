@@ -7,12 +7,13 @@ import socket from "../../../socketConfig";
 const StudentPollingPage = () => {
   const [timeSec, setTimeSec] = useState(60);
   let myInterval = "";
+  let myTimeout = "";
   const timer = () => {
     {
       myInterval = setInterval(() => {
         setTimeSec((prevVal) => prevVal - 1);
       }, 1000);
-      setTimeout(() => {
+      myTimeout = setTimeout(() => {
         clearInterval(myInterval);
         if (!isAnswered) {
           setIsAnswered(true);
@@ -33,11 +34,11 @@ const StudentPollingPage = () => {
     });
     socket.on("updateQuestion", (question) => {
       setQuestionOption(question);
-      console.log("NOWWWWW");
-      console.log(question);
+
       if (!isAnswered && question) {
         console.log("timer started");
         clearInterval(myInterval);
+        clearTimeout(myTimeout);
         setTimeSec(60);
         timer();
       }
@@ -49,9 +50,12 @@ const StudentPollingPage = () => {
     socket.on("voteCompleted", (value) => {
       if (value) {
         setBtnWait("Next Question");
+      } else {
+        setIsAnswered(false);
+        setBtnWait("Waiting for teacher to ask question");
       }
     });
-  }, []);
+  }, [socket]);
 
   let answer = sessionStorage.getItem("answer") === null ? false : true;
   const [isAnswered, setIsAnswered] = useState(answer);

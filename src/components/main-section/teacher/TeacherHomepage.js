@@ -28,14 +28,14 @@ const TeacherHomepage = () => {
   useEffect(() => {
     socket.on("queeCompleted", (value) => {
       if (value) {
-        setAddQuestBtn(true);
-      } else {
-        setAddQuestBtn(false);
+        setQueeOption(true);
       }
     });
     socket.on("voteCompleted", (value) => {
       if (value) {
         setBtnWait("Add Question");
+      } else {
+        setBtnWait("Waiting for students to answer");
       }
     });
   }, [socket]);
@@ -82,6 +82,7 @@ const TeacherHomepage = () => {
     const question = questRef.current.value.trim();
     const options = [];
     let isChecked = false;
+    setBtnWait("Waiting for students to answer");
 
     if (question !== "") {
       for (let i = 1; i < optionNum; i++) {
@@ -125,6 +126,7 @@ const TeacherHomepage = () => {
       return toastErrorDisplayer("Question field cannot be empty!");
     }
   };
+  console.log(dataPoll);
   return (
     <div className="card">
       <ToastContainer />
