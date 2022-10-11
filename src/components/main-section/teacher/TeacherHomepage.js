@@ -65,52 +65,66 @@ const TeacherHomepage = () => {
     setQueeOption(null);
   };
 
+  const toastErrorDisplayer = (error) => {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  };
+
   const askQuestionHandler = () => {
     const question = questRef.current.value.trim();
     const options = [];
+    let isChecked = false;
 
     if (question !== "") {
-      setQueeOption(true);
       for (let i = 1; i < optionNum; i++) {
         const option = document.getElementById(`option${i}`);
         const checkBox = document.getElementById(`optionCheck${i}`);
-        options.push(option.value);
-
-        // Create options to emit
-        const answers = {};
-        const percentage = {};
-        for (let i = 0; i < options.length; i++) {
-          answers[options[i]] = 0;
-          percentage[options[i]] = 0;
+        if (checkBox.checked) {
+          isChecked = true;
         }
-
-        socket.emit(
-          "updateQuestionsAndOption",
-          { question, options },
-          {
-            options,
-            answers,
-            totalAnswers: 0,
-            percentage,
-            totalVote: 0,
-            nextQuestionQuee: 0,
-          }
+        if (option.value.trim() === "") {
+          return toastErrorDisplayer("Options can't be empty.");
+        }
+        options.push(option.value);
+      }
+      if (!isChecked) {
+        return toastErrorDisplayer(
+          "There should be atleast one correct option."
         );
       }
+      setQueeOption(true);
+      // Create options to emit
+      const answers = {};
+      const percentage = {};
+      for (let i = 0; i < options.length; i++) {
+        answers[options[i]] = 0;
+        percentage[options[i]] = 0;
+      }
+
+      socket.emit(
+        "updateQuestionsAndOption",
+        { question, options },
+        {
+          options,
+          answers,
+          totalAnswers: 0,
+          percentage,
+          totalVote: 0,
+          nextQuestionQuee: 0,
+        }
+      );
     } else {
-      toast.error("Question field cannot be empty!", {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      return toastErrorDisplayer("Question field cannot be empty!");
     }
   };
-
   return (
     <div className="card">
       <ToastContainer />
@@ -127,7 +141,7 @@ const TeacherHomepage = () => {
             <div>
               <h2 style={{ marginBottom: "5px" }}>Options</h2>
               <input
-                className="card__input block mb-5"
+                className="card__input block mb-5 card-options-check"
                 type="text"
                 placeholder="Option 1"
                 id="option1"

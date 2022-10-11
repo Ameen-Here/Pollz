@@ -11,8 +11,9 @@ const path = require("path");
 const http = require("http");
 const cors = require("cors");
 
-const server = http.createServer(app);
+// const server = http.createServer(app);
 const port = process.env.PORT || 3001;
+const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.use(cors());
 
@@ -97,4 +98,4 @@ io.on("connection", (socket) => {
 
 // Routing
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
+// server.listen(port, () => console.log(`Listening on port ${port}`));

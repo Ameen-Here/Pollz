@@ -5,6 +5,22 @@ import "./StudentPollingPage.css";
 import socket from "../../../socketConfig";
 
 const StudentPollingPage = () => {
+  const [timeSec, setTimeSec] = useState(60);
+  const timer = () => {
+    {
+      const myInterval = setInterval(() => {
+        setTimeSec((prevVal) => prevVal - 1);
+      }, 1000);
+      setTimeout(() => {
+        setIsAnswered(true);
+        clearInterval(myInterval);
+
+        socket.emit("updatePoll", null);
+        setTimeSec(60);
+      }, 60000);
+    }
+  };
+
   useEffect(() => {
     socket.emit("started");
   }, []);
@@ -15,6 +31,9 @@ const StudentPollingPage = () => {
     });
     socket.on("updateQuestion", (question) => {
       setQuestionOption(question);
+      if (!isAnswered && question) {
+        timer();
+      }
     });
   }, [socket]);
 
@@ -50,19 +69,6 @@ const StudentPollingPage = () => {
     socket.emit("queeNext");
   };
 
-  const timer = () => {
-    {
-      const myInterval = setInterval(
-        () => setTimeSec((prevVal) => prevVal - 1),
-        1000
-      );
-      setTimeout(() => {
-        setIsAnswered(true);
-        clearInterval(myInterval);
-        socket.emit("updatePoll", null);
-      }, 60000);
-    }
-  };
   return (
     <div className="card">
       {!questionOption && !isAnswered && (
@@ -73,10 +79,8 @@ const StudentPollingPage = () => {
       )}
       {questionOption && !isAnswered && (
         <>
-          {/* */}
-          {timer()}
           <h2 className="card__question">
-            {questionOption.question}
+            {questionOption.question}{" "}
             <span className="timer">{timeSec}/60</span>
           </h2>
           <ul className="card__options">
