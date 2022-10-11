@@ -22,7 +22,13 @@ app.use(express.static(path.join(__dirname + "/public"))); // To join react app
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const io = require("socket.io")(server);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: ["http://localhost:3000"],
+  },
+});
+
+// const io = require("socket.io")(server);
 
 // Initialize options
 

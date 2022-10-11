@@ -19,7 +19,7 @@
 span.percentage-value {
   position: absolute;
   top: 50%;
-  right: 20px;
+  right: 30px;
   width: 40px;
   transform: translateY(-50%);
   color: #111;

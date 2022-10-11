@@ -118,11 +118,13 @@ const StudentPollingPage = () => {
               ></span>
               <span className="percentage-value">
                 {dataPoll.answers[option]} (
-                {(
-                  (dataPoll.answers[option] / dataPoll.totalAnswers) *
-                  100
-                ).toFixed(1)}
-                %)
+                {dataPoll.answers[option] === 0
+                  ? 0
+                  : (
+                      (dataPoll.answers[option] / dataPoll.totalAnswers) *
+                      100
+                    ).toFixed(1)}
+                %
               </span>
             </div>
           ))}
