@@ -4,7 +4,7 @@ const StudentHomepage = (props) => {
   const nameInp = useRef();
   const submitHandler = () => {
     if (nameInp.current.value.trim() !== "") {
-      return props.currentPage("submitName");
+      return props.currentPage("submitName", nameInp.current.value.trim());
     }
     alert("Name field can't be blank");
   };

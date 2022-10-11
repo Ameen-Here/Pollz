@@ -24,7 +24,11 @@ const io = require("socket.io")(server, {
 });
 
 // Initialize options
-const options = {};
+const options = {
+  1: 1,
+  totalVote: 0,
+  name: "",
+};
 
 // On new client connextion
 io.on("connection", (socket) => {
@@ -35,13 +39,20 @@ io.on("connection", (socket) => {
   io.emit("update", options);
   io.emit("voteCompleted", false);
 
+  // On new user
+  socket.on("name", (name) => {
+    options["name"] = name;
+  });
   // On new vote
   socket.on("vote", (index) => {
     // Increase the vote at index
-    if (candidate[index]) {
-      candidate[index].vote += 1;
+    console.log(index);
+    console.log(options[index]);
+    if (options[index]) {
+      options[index] += 1;
     }
-    if (candidate[totalVote] === io.engine.clientsCount - 1) {
+    options["totalVote"] += 1;
+    if (options["totalVote"] === io.engine.clientsCount - 1) {
       // Emit voteComplete if all students voted
       io.emit("voteCompleted", true);
     }
