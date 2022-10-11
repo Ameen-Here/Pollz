@@ -6,17 +6,19 @@ import socket from "../../../socketConfig";
 
 const StudentPollingPage = () => {
   const [timeSec, setTimeSec] = useState(60);
+  let myInterval = "";
   const timer = () => {
     {
-      const myInterval = setInterval(() => {
+      myInterval = setInterval(() => {
         setTimeSec((prevVal) => prevVal - 1);
       }, 1000);
       setTimeout(() => {
-        setIsAnswered(true);
         clearInterval(myInterval);
+        if (!isAnswered) {
+          setIsAnswered(true);
 
-        socket.emit("updatePoll", null);
-        setTimeSec(60);
+          socket.emit("updatePoll", null);
+        }
       }, 60000);
     }
   };
@@ -31,7 +33,12 @@ const StudentPollingPage = () => {
     });
     socket.on("updateQuestion", (question) => {
       setQuestionOption(question);
+      console.log("NOWWWWW");
+      console.log(question);
       if (!isAnswered && question) {
+        console.log("timer started");
+        clearInterval(myInterval);
+        setTimeSec(60);
         timer();
       }
     });
@@ -124,7 +131,7 @@ const StudentPollingPage = () => {
                       (dataPoll.answers[option] / dataPoll.totalAnswers) *
                       100
                     ).toFixed(1)}
-                %
+                %)
               </span>
             </div>
           ))}

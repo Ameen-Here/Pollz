@@ -165,9 +165,10 @@ const TeacherHomepage = () => {
                 name="option1"
               />
               <button
-                className={
-                  addQuestBtn ? "card__button" : "card__button disableBtn"
-                }
+                // className={
+                //   addQuestBtn ? "card__button" : "card__button disableBtn"
+                // }
+                className="card__button"
                 id="askQuestBtn"
                 onClick={askQuestionHandler}
               >
