@@ -17,6 +17,11 @@ const port = process.env.PORT || 3001;
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
+// Other middlewares
+app.use(express.static(path.join(__dirname + "/public"))); // To join react app
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const io = require("socket.io")(
   server,
 
@@ -28,42 +33,18 @@ const io = require("socket.io")(
 );
 
 // Initialize options
-const defaultOption = {
-  options: [],
-  answers: {},
-  totalAnswers: 0,
-  percentage: {},
-  totalVote: 0,
-  nextQuestionQuee: 0,
-};
+
 let options = null;
-// {
-//   options: [91, 23, 66, 42],
-//   answers: { 91: 23, 23: 42, 66: 10, 42: 100 },
-//   totalAnswers: 155,
-//   isFullyAnswered: false,
-//   percentage: { 91: 14.8, 23: 27.1, 66: 6.5, 42: 64.5 },
-//   totalVote: 0,
-//   nextQuestionQuee: 0,
-// };
 
 let questionOption = null;
-
-//  {
-//     question: "How many movies Shah Rukh Khan featured in?",
-//     options: [91, 23, 66, 42],
-//   };
 
 // On new client connection
 
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
-  console.log(options);
   socket.on("disconnect", () => {
     console.log("🔥: A user disconnected");
   });
-
-  // io.emit("voteCompleted", false);
 
   socket.on("updateQuestionsAndOption", (questionVal, optionVal) => {
     questionOption = questionVal;
@@ -78,6 +59,7 @@ io.on("connection", (socket) => {
     io.emit("updateQuestion", questionOption);
     io.emit("voteCompleted", false);
   });
+
   // On new vote
   socket.on("updatePoll", (option) => {
     // Increase the vote at index
@@ -85,11 +67,13 @@ io.on("connection", (socket) => {
 
     options["totalVote"] += 1;
     options["totalAnswers"] += 1;
-    // for (let i = 0; i < options.options.length; i++) {
-    //   const val = options.options[i];
-    //   options["percentage"][val] =
-    //     (options.answers[val] / options.totalAnswers) * 100;
-    // }
+
+    // Updating percentage value
+    for (let i = 0; i < options.options.length; i++) {
+      const val = options.options[i];
+      options["percentage"][val] =
+        (options.answers[val] / options.totalAnswers) * 100;
+    }
 
     if (options["totalVote"] >= io.engine.clientsCount - 1) {
       // Emit voteComplete if all students voted
@@ -105,7 +89,7 @@ io.on("connection", (socket) => {
 
   socket.on("queeNext", () => {
     options.nextQuestionQuee += 1;
-    if (options.nextQuestionQuee === io.engine.clientsCount - 1) {
+    if (options.nextQuestionQuee === options.totalAnswers) {
       io.emit("queeCompleted", true);
 
       options = null;
@@ -115,11 +99,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
-// Other middlewares
-app.use(express.static(path.join(__dirname + "/public"))); // To join react app
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Routing
 

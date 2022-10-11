@@ -2,6 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 
 import socket from "../../../socketConfig";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const TeacherHomepage = () => {
   const [optionNum, setOptionNum] = useState(2);
   const questRef = useRef();
@@ -62,8 +65,9 @@ const TeacherHomepage = () => {
   const askQuestionHandler = () => {
     const question = questRef.current.value.trim();
     const options = [];
-    setQueeOption(true);
+
     if (question !== "") {
+      setQueeOption(true);
       console.log(optionNum);
       for (let i = 1; i < optionNum; i++) {
         const option = document.getElementById(`option${i}`);
@@ -97,13 +101,23 @@ const TeacherHomepage = () => {
         );
       }
     } else {
-      alert("Question field cannot be empty!");
+      toast.error("Question field cannot be empty!", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
   };
 
   console.log(dataPoll);
   return (
     <div className="card">
+      <ToastContainer />
       {!queuOption && (
         <>
           <h2 className="card__question">Enter the questions and options?</h2>
