@@ -4,9 +4,6 @@ import "./StudentPollingPage.css";
 
 import socket from "../../../socketConfig";
 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
 const StudentPollingPage = () => {
   useEffect(() => {
     socket.emit("started");
@@ -55,25 +52,19 @@ const StudentPollingPage = () => {
 
   const timer = () => {
     {
-      toast.info("Answer within 60 seconds", {
-        position: "top-right",
-        autoClose: 60000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      const myInterval = setInterval(
+        () => setTimeSec((prevVal) => prevVal - 1),
+        1000
+      );
       setTimeout(() => {
         setIsAnswered(true);
+        clearInterval(myInterval);
         socket.emit("updatePoll", null);
       }, 60000);
     }
   };
   return (
     <div className="card">
-      <ToastContainer />
       {!questionOption && !isAnswered && (
         <h3>
           Waiting for teacher to ask question or students to finish previous
@@ -84,7 +75,10 @@ const StudentPollingPage = () => {
         <>
           {/* */}
           {timer()}
-          <h2 className="card__question">{questionOption.question}</h2>
+          <h2 className="card__question">
+            {questionOption.question}
+            <span className="timer">{timeSec}/60</span>
+          </h2>
           <ul className="card__options">
             {questionOption.options.map((option) => (
               <li>
@@ -119,11 +113,12 @@ const StudentPollingPage = () => {
                 }}
               ></span>
               <span className="percentage-value">
+                {dataPoll.answers[option]} (
                 {(
                   (dataPoll.answers[option] / dataPoll.totalAnswers) *
                   100
                 ).toFixed(1)}
-                %
+                %)
               </span>
             </div>
           ))}
