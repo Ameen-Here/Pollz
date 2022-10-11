@@ -7,8 +7,12 @@ import TeacherHomepage from "./teacher/TeacherHomepage";
 
 const MainSection = () => {
   const [currentPage, updateCurrentPage] = useState("homepage");
-  const selectUserHandler = function (val) {
+  const selectUserHandler = async function (val) {
     console.log(val);
+    const res = await fetch("/connected");
+    console.log(res);
+    const resJson = await res.json();
+    console.log(resJson);
     if (val === "student") {
       updateCurrentPage("student");
     } else {
