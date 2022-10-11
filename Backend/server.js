@@ -32,20 +32,18 @@ const defaultOption = {
   totalVote: 0,
   nextQuestionQuee: 0,
 };
-let options = {
-  options: [91, 23, 66, 42],
-  answers: { 91: 23, 23: 42, 66: 10, 42: 100 },
-  totalAnswers: 155,
-  isFullyAnswered: false,
-  percentage: { 91: 14.8, 23: 27.1, 66: 6.5, 42: 64.5 },
-  totalVote: 0,
-  nextQuestionQuee: 0,
-};
+let options = null;
+// {
+//   options: [91, 23, 66, 42],
+//   answers: { 91: 23, 23: 42, 66: 10, 42: 100 },
+//   totalAnswers: 155,
+//   isFullyAnswered: false,
+//   percentage: { 91: 14.8, 23: 27.1, 66: 6.5, 42: 64.5 },
+//   totalVote: 0,
+//   nextQuestionQuee: 0,
+// };
 
-let questionOption = {
-  question: "How many movies Shah Rukh Khan featured in?",
-  options: [91, 23, 66, 42],
-};
+let questionOption = null;
 
 //  {
 //     question: "How many movies Shah Rukh Khan featured in?",
@@ -56,6 +54,7 @@ let questionOption = {
 
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
+  console.log(options);
   socket.on("disconnect", () => {
     console.log("🔥: A user disconnected");
   });
@@ -64,10 +63,16 @@ io.on("connection", (socket) => {
   io.emit("updateQuestion", questionOption);
   io.emit("voteCompleted", false);
 
-  // On new user
-  socket.on("name", (name) => {
-    options["name"] = name;
+  socket.on("updateQuestionsAndOption", (questionVal, optionVal) => {
+    questionOption = questionVal;
+    options = optionVal;
+    console.log("here");
+    console.log(options);
+    io.emit("getPoll", options);
+    io.emit("updateQuestion", questionOption);
   });
+
+  // On new user
   socket.on("started", () => {
     io.emit("getPoll", options);
     io.emit("updateQuestion", questionOption);
@@ -75,21 +80,22 @@ io.on("connection", (socket) => {
   // On new vote
   socket.on("updatePoll", (option) => {
     // Increase the vote at index
-    console.log(option);
-    console.log(options["answers"][option]);
-    if (options["answers"][option]) {
-      options["answers"][option] += 1;
-    }
+    options["answers"][option] += 1;
+
     options["totalVote"] += 1;
     options["totalAnswers"] += 1;
-    options["percentage"][option] =
-      (options.answers[option] / options.totalAnswers) * 100;
+    // for (let i = 0; i < options.options.length; i++) {
+    //   const val = options.options[i];
+    //   options["percentage"][val] =
+    //     (options.answers[val] / options.totalAnswers) * 100;
+    // }
 
-    console.log("////////");
-    console.log(options["totalVote"], io.engine.clientsCount);
-    if (options["totalVote"] === io.engine.clientsCount) {
+    console.log("/////////////////////////////////////////");
+    console.log(options["totalVote"], io.engine.clientsCount - 1);
+
+    if (options["totalVote"] === io.engine.clientsCount - 1) {
       // Emit voteComplete if all students voted
-      console.log("here");
+
       questionOption = null;
 
       io.emit("voteCompleted", true);
@@ -98,9 +104,10 @@ io.on("connection", (socket) => {
 
     io.emit("getPoll", options);
   });
+
   socket.on("queeNext", () => {
     options.nextQuestionQuee += 1;
-    if (options.nextQuestionQuee === io.engine.clientsCount) {
+    if (options.nextQuestionQuee === io.engine.clientsCount - 1) {
       options = defaultOption;
       io.emit("getPoll", options);
     }

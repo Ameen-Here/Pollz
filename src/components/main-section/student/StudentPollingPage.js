@@ -8,11 +8,9 @@ const StudentPollingPage = () => {
   socket.emit("started");
   useEffect(() => {
     socket.on("getPoll", (polls) => {
-      console.log(polls);
       setDataPoll(polls);
     });
     socket.on("updateQuestion", (question) => {
-      console.log(question);
       setQuestionOption(question);
     });
   }, [socket]);
@@ -28,7 +26,7 @@ const StudentPollingPage = () => {
   const [isAnswered, setIsAnswered] = useState(answer);
   const [dataPoll, setDataPoll] = useState(null);
 
-  let [questionOption, setQuestionOption] = useState(null);
+  const [questionOption, setQuestionOption] = useState(null);
 
   const optionSubmitHandler = () => {
     for (let i = 0; i < questionOption.options.length; i++) {
@@ -37,6 +35,7 @@ const StudentPollingPage = () => {
 
         sessionStorage.setItem("answer", questionOption.options[i]);
         setIsAnswered(true);
+        console.log("///////");
         console.log(questionOption.options[i]);
         socket.emit("updatePoll", questionOption.options[i]);
       }
