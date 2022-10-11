@@ -8,29 +8,21 @@ const app = express();
 const path = require("path");
 
 // Import HTTP and CORS to allow data transfer
-const http = require("http").Server(app);
+const http = require("http");
 const cors = require("cors");
+
+const server = http.createServer(app);
 
 app.use(cors());
 
 const port = process.env.PORT || 3001;
-
-const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // Other middlewares
 app.use(express.static(path.join(__dirname + "/public"))); // To join react app
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const io = require("socket.io")(
-  server,
-
-  {
-    cors: {
-      origin: ["http://localhost:3000"],
-    },
-  }
-);
+const io = require("socket.io")(server);
 
 // Initialize options
 
@@ -106,6 +98,4 @@ io.on("connection", (socket) => {
 
 // Routing
 
-app.get("/connected", (req, res) => {
-  res.send({ status: "Successful" });
-});
+server.listen(port, () => console.log(`Listening on port ${port}`));
