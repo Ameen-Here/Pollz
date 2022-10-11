@@ -4,8 +4,14 @@ import "./StudentPollingPage.css";
 
 import socket from "../../../socketConfig";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const StudentPollingPage = () => {
-  socket.emit("started");
+  useEffect(() => {
+    socket.emit("started");
+  }, []);
+
   useEffect(() => {
     socket.on("getPoll", (polls) => {
       setDataPoll(polls);
@@ -16,11 +22,13 @@ const StudentPollingPage = () => {
   }, [socket]);
 
   const [btnWait, setBtnWait] = useState("Waiting for teacher to ask question");
-  socket.on("voteCompleted", (value) => {
-    if (value) {
-      setBtnWait("Next Question");
-    }
-  });
+  useEffect(() => {
+    socket.on("voteCompleted", (value) => {
+      if (value) {
+        setBtnWait("Next Question");
+      }
+    });
+  }, []);
 
   let answer = sessionStorage.getItem("answer") === null ? false : true;
   const [isAnswered, setIsAnswered] = useState(answer);
@@ -31,12 +39,9 @@ const StudentPollingPage = () => {
   const optionSubmitHandler = () => {
     for (let i = 0; i < questionOption.options.length; i++) {
       if (document.getElementById(questionOption.options[i]).checked) {
-        console.log("????");
-
         sessionStorage.setItem("answer", questionOption.options[i]);
         setIsAnswered(true);
-        console.log("///////");
-        console.log(questionOption.options[i]);
+
         socket.emit("updatePoll", questionOption.options[i]);
       }
     }
@@ -47,8 +52,28 @@ const StudentPollingPage = () => {
     setIsAnswered(false);
     socket.emit("queeNext");
   };
+
+  const timer = () => {
+    {
+      toast.info("Answer within 3 seconds", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      setTimeout(() => {
+        setIsAnswered(true);
+        socket.emit("updatePoll", null);
+      }, 3000);
+    }
+  };
   return (
     <div className="card">
+      <ToastContainer />
       {!questionOption && !isAnswered && (
         <h3>
           Waiting for teacher to ask question or students to finish previous
@@ -57,6 +82,8 @@ const StudentPollingPage = () => {
       )}
       {questionOption && !isAnswered && (
         <>
+          {/* */}
+          {timer()}
           <h2 className="card__question">{questionOption.question}</h2>
           <ul className="card__options">
             {questionOption.options.map((option) => (

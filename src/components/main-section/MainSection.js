@@ -11,10 +11,6 @@ const MainSection = () => {
     name === null ? "homepage" : name === "teacher" ? "teacher" : "student";
   const [currentPage, updateCurrentPage] = useState(pageName);
   const selectUserHandler = async function (val) {
-    const res = await fetch("/connected");
-    console.log(res);
-    const resJson = await res.json();
-    console.log(resJson);
     if (val === "student") {
       updateCurrentPage("student");
     } else {

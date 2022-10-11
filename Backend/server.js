@@ -62,19 +62,25 @@ io.on("connection", (socket) => {
 
   // On new vote
   socket.on("updatePoll", (option) => {
-    // Increase the vote at index
-    options["answers"][option] += 1;
+    if (option === null) {
+      io.emit("getPoll", options);
+      options["totalVote"] += 1;
+    } else {
+      // Increase the vote at index
+      options["answers"][option] += 1;
 
-    options["totalVote"] += 1;
-    options["totalAnswers"] += 1;
+      options["totalVote"] += 1;
+      options["totalAnswers"] += 1;
 
-    // Updating percentage value
-    for (let i = 0; i < options.options.length; i++) {
-      const val = options.options[i];
-      options["percentage"][val] =
-        (options.answers[val] / options.totalAnswers) * 100;
+      // Updating percentage value
+      for (let i = 0; i < options.options.length; i++) {
+        const val = options.options[i];
+        options["percentage"][val] =
+          (options.answers[val] / options.totalAnswers) * 100;
+      }
+
+      io.emit("getPoll", options);
     }
-
     if (options["totalVote"] >= io.engine.clientsCount - 1) {
       // Emit voteComplete if all students voted
       questionOption = null;
@@ -83,8 +89,6 @@ io.on("connection", (socket) => {
       io.emit("voteCompleted", true);
       io.emit("queeCompleted", false);
     }
-
-    io.emit("getPoll", options);
   });
 
   socket.on("queeNext", () => {

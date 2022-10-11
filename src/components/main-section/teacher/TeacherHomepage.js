@@ -9,7 +9,10 @@ const TeacherHomepage = () => {
   const [optionNum, setOptionNum] = useState(2);
   const questRef = useRef();
 
-  socket.emit("started");
+  useEffect(() => {
+    socket.emit("started");
+  }, []);
+
   useEffect(() => {
     socket.on("getPoll", (polls) => {
       setDataPoll(polls);
@@ -68,14 +71,10 @@ const TeacherHomepage = () => {
 
     if (question !== "") {
       setQueeOption(true);
-      console.log(optionNum);
       for (let i = 1; i < optionNum; i++) {
         const option = document.getElementById(`option${i}`);
-        console.log(option.value);
         const checkBox = document.getElementById(`optionCheck${i}`);
         options.push(option.value);
-
-        // Create questionOption obj to emit
 
         // Create options to emit
         const answers = {};
@@ -84,8 +83,6 @@ const TeacherHomepage = () => {
           answers[options[i]] = 0;
           percentage[options[i]] = 0;
         }
-
-        console.log(answers, percentage);
 
         socket.emit(
           "updateQuestionsAndOption",
@@ -114,7 +111,6 @@ const TeacherHomepage = () => {
     }
   };
 
-  console.log(dataPoll);
   return (
     <div className="card">
       <ToastContainer />
