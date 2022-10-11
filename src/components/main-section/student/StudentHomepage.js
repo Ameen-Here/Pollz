@@ -3,10 +3,11 @@ import React, { useRef } from "react";
 const StudentHomepage = (props) => {
   const nameInp = useRef();
   const submitHandler = () => {
-    if (nameInp.current.value.trim() !== "") {
+    const name = nameInp.current.value.trim().toLowerCase();
+    if (name !== "" && name !== "teacher") {
       return props.currentPage("submitName", nameInp.current.value.trim());
     }
-    alert("Name field can't be blank");
+    alert("Name field can't be blank or 'teacher'");
   };
   return (
     <div className="card">

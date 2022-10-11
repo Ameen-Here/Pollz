@@ -18,6 +18,7 @@ const MainSection = () => {
     if (val === "student") {
       updateCurrentPage("student");
     } else {
+      sessionStorage.setItem("name", "teacher");
       updateCurrentPage("teacher");
     }
   };

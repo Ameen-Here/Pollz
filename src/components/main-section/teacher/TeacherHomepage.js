@@ -9,8 +9,6 @@ const TeacherHomepage = () => {
   socket.emit("started");
   useEffect(() => {
     socket.on("getPoll", (polls) => {
-      console.log("////////////////////////////");
-      console.log(polls);
       setDataPoll(polls);
     });
   }, [socket]);
@@ -19,11 +17,22 @@ const TeacherHomepage = () => {
   const [dataPoll, setDataPoll] = useState(null);
 
   const [btnWait, setBtnWait] = useState("Waiting for students to answer");
-  socket.on("voteCompleted", (value) => {
-    if (value) {
-      setBtnWait("Add Question");
-    }
-  });
+
+  const [addQuestBtn, setAddQuestBtn] = useState(true);
+  useEffect(() => {
+    socket.on("queeCompleted", (value) => {
+      if (value) {
+        setAddQuestBtn(true);
+      } else {
+        setAddQuestBtn(false);
+      }
+    });
+    socket.on("voteCompleted", (value) => {
+      if (value) {
+        setBtnWait("Add Question");
+      }
+    });
+  }, [socket]);
 
   const addAnotherOptionHandler = () => {
     const addBtn = document.getElementById("addAnotherBtn");
@@ -45,7 +54,6 @@ const TeacherHomepage = () => {
   };
 
   const nextQstnHandler = () => {
-    socket.emit("updateQuestionsAndOption", null, null);
     setOptionNum(2);
     setDataPoll(null);
     setQueeOption(null);
@@ -133,7 +141,9 @@ const TeacherHomepage = () => {
                 name="option1"
               />
               <button
-                className="card__button block"
+                className={
+                  addQuestBtn ? "card__button" : "card__button disableBtn"
+                }
                 id="askQuestBtn"
                 onClick={askQuestionHandler}
               >

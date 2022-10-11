@@ -17,11 +17,15 @@ const port = process.env.PORT || 3001;
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 
-const io = require("socket.io")(server, {
-  cors: {
-    origin: ["http://localhost:3000"],
-  },
-});
+const io = require("socket.io")(
+  server,
+
+  {
+    cors: {
+      origin: ["http://localhost:3000"],
+    },
+  }
+);
 
 // Initialize options
 const defaultOption = {
@@ -59,15 +63,11 @@ io.on("connection", (socket) => {
     console.log("🔥: A user disconnected");
   });
 
-  io.emit("getPoll", options);
-  io.emit("updateQuestion", questionOption);
-  io.emit("voteCompleted", false);
+  // io.emit("voteCompleted", false);
 
   socket.on("updateQuestionsAndOption", (questionVal, optionVal) => {
     questionOption = questionVal;
     options = optionVal;
-    console.log("here");
-    console.log(options);
     io.emit("getPoll", options);
     io.emit("updateQuestion", questionOption);
   });
@@ -76,6 +76,7 @@ io.on("connection", (socket) => {
   socket.on("started", () => {
     io.emit("getPoll", options);
     io.emit("updateQuestion", questionOption);
+    io.emit("voteCompleted", false);
   });
   // On new vote
   socket.on("updatePoll", (option) => {
@@ -90,16 +91,13 @@ io.on("connection", (socket) => {
     //     (options.answers[val] / options.totalAnswers) * 100;
     // }
 
-    console.log("/////////////////////////////////////////");
-    console.log(options["totalVote"], io.engine.clientsCount - 1);
-
-    if (options["totalVote"] === io.engine.clientsCount - 1) {
+    if (options["totalVote"] >= io.engine.clientsCount - 1) {
       // Emit voteComplete if all students voted
-
       questionOption = null;
+      io.emit("updateQuestion", questionOption);
 
       io.emit("voteCompleted", true);
-      io.emit("updateQuestion", questionOption);
+      io.emit("queeCompleted", false);
     }
 
     io.emit("getPoll", options);
@@ -108,8 +106,12 @@ io.on("connection", (socket) => {
   socket.on("queeNext", () => {
     options.nextQuestionQuee += 1;
     if (options.nextQuestionQuee === io.engine.clientsCount - 1) {
-      options = defaultOption;
+      io.emit("queeCompleted", true);
+
+      options = null;
+
       io.emit("getPoll", options);
+      io.emit("voteCompleted", false);
     }
   });
 });
