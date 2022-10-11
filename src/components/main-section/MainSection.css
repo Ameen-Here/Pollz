@@ -132,3 +132,50 @@
 .mb-5 {
   margin-bottom: 15px;
 }
+
+/* ===================  BREAKPOINTS =================== */
+
+/* For large devices */
+@media screen and (max-width: 850px) {
+  .card__input-question {
+    width: 450px;
+  }
+}
+
+/* For medium devices */
+
+@media screen and (max-width: 576px) {
+  .card__input-question {
+    width: 300px;
+  }
+  .card__option-correct-display {
+    gap: 1.5rem;
+  }
+}
+
+/* For smaller device */
+@media screen and (max-width: 420px) {
+  .card__input-question {
+    width: 200px;
+  }
+  .card__option-correct-display {
+    gap: 1rem;
+  }
+
+  .card__input {
+    width: 80px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .card__input-question {
+    width: 100px;
+  }
+  .card__option-correct-display {
+    gap: 1rem;
+  }
+
+  .card__input {
+    width: 40px;
+  }
+}

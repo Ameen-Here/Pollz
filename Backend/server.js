@@ -12,10 +12,9 @@ const http = require("http");
 const cors = require("cors");
 
 const server = http.createServer(app);
+const port = process.env.PORT || 3001;
 
 app.use(cors());
-
-const port = process.env.PORT || 3001;
 
 // Other middlewares
 app.use(express.static(path.join(__dirname + "/public"))); // To join react app

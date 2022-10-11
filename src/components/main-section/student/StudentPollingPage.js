@@ -55,9 +55,9 @@ const StudentPollingPage = () => {
 
   const timer = () => {
     {
-      toast.info("Answer within 3 seconds", {
+      toast.info("Answer within 60 seconds", {
         position: "top-right",
-        autoClose: 3000,
+        autoClose: 60000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: false,
@@ -68,7 +68,7 @@ const StudentPollingPage = () => {
       setTimeout(() => {
         setIsAnswered(true);
         socket.emit("updatePoll", null);
-      }, 3000);
+      }, 60000);
     }
   };
   return (
