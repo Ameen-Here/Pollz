@@ -37,3 +37,9 @@ span.percentage-bar {
   opacity: 60%;
   transition: width 300ms ease-in-out;
 }
+
+.disableBtn {
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: #3a3a3a;
+}

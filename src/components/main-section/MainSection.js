@@ -6,7 +6,10 @@ import Student from "./student/Student";
 import TeacherHomepage from "./teacher/TeacherHomepage";
 
 const MainSection = () => {
-  const [currentPage, updateCurrentPage] = useState("homepage");
+  const name = sessionStorage.getItem("name");
+  const pageName =
+    name === null ? "homepage" : name === "teacher" ? "teacher" : "student";
+  const [currentPage, updateCurrentPage] = useState(pageName);
   const selectUserHandler = async function (val) {
     const res = await fetch("/connected");
     console.log(res);

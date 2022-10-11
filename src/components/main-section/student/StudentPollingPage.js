@@ -1,73 +1,119 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import "./StudentPollingPage.css";
 
+import socket from "../../../socketConfig";
+
 const StudentPollingPage = () => {
-  const TEMP_DATA = {
-    question: "How many movies Shah Rukh Khan featured in?",
-    options: [91, 23, 66, 42],
-  };
+  socket.emit("started");
+  useEffect(() => {
+    socket.on("getPoll", (polls) => {
+      console.log(polls);
+      setDataPoll(polls);
+    });
+    socket.on("updateQuestion", (question) => {
+      console.log(question);
+      setQuestionOption(question);
+    });
+  }, [socket]);
 
-  const TEMP_DATA_POLL = {
-    options: [91, 23, 66, 42],
-    answers: { 91: 23, 23: 42, 66: 10, 42: 100 },
-    totalAnswers: 155,
-    percentage: { 91: 14.8, 23: 27.1, 66: 6.5, 42: 64.5 },
-    isFullyAnswered: false,
-  };
+  const [btnWait, setBtnWait] = useState("Waiting for teacher to ask question");
+  socket.on("voteCompleted", (value) => {
+    if (value) {
+      setBtnWait("Next Question");
+    }
+  });
 
-  const submitHandler = () => {
-    for (let i = 0; i < TEMP_DATA.options.length; i++) {
-      if (document.getElementById(TEMP_DATA.options[i]).checked) {
-        console.log(document.getElementById(TEMP_DATA.options[i]).id);
+  let answer = sessionStorage.getItem("answer") === null ? false : true;
+  const [isAnswered, setIsAnswered] = useState(answer);
+  const [dataPoll, setDataPoll] = useState(null);
+
+  let [questionOption, setQuestionOption] = useState(null);
+
+  const optionSubmitHandler = () => {
+    for (let i = 0; i < questionOption.options.length; i++) {
+      if (document.getElementById(questionOption.options[i]).checked) {
+        console.log("????");
+
+        sessionStorage.setItem("answer", questionOption.options[i]);
+        setIsAnswered(true);
+        console.log(questionOption.options[i]);
+        socket.emit("updatePoll", questionOption.options[i]);
       }
     }
   };
+
+  const nextQstnHandler = () => {
+    sessionStorage.setItem("answer", null);
+    setIsAnswered(false);
+    socket.emit("queeNext");
+  };
   return (
     <div className="card">
-      {/* <h3>Waiting for teacher to ask question...</h3> */}
-      {/* <h2 className="card__question">{TEMP_DATA.question}</h2>
-      <ul className="card__options">
-        {TEMP_DATA.options.map((option) => (
-          <li>
-            <input
-              key={option}
-              type="radio"
-              id={option}
-              name="radio-group"
-              className="card__options"
-            />
-            <label htmlFor={option}>{option}</label>
-          </li>
-        ))}
-      </ul>
-      <button className="card__button" onClick={submitHandler}>
-        Submit Answer
-      </button> */}
-      <h2>Polling Results</h2>
+      {!questionOption && !isAnswered && (
+        <h3>
+          Waiting for teacher to ask question or students to finish previous
+          one...
+        </h3>
+      )}
+      {questionOption && !isAnswered && (
+        <>
+          <h2 className="card__question">{questionOption.question}</h2>
+          <ul className="card__options">
+            {questionOption.options.map((option) => (
+              <li>
+                <input
+                  key={option}
+                  type="radio"
+                  id={option}
+                  name="radio-group"
+                  className="card__options"
+                />
+                <label htmlFor={option}>{option}</label>
+              </li>
+            ))}
+          </ul>
+          <button className="card__button" onClick={optionSubmitHandler}>
+            Submit Answer
+          </button>
+        </>
+      )}
 
-      {TEMP_DATA_POLL.options.map((option) => (
-        <div className="card__poll-result">
-          {option}
-          <span
-            className="percentage-bar"
-            style={{
-              width: `${TEMP_DATA_POLL.percentage[option]}%`,
-            }}
-          ></span>
-          <span className="percentage-value">
-            {(
-              (TEMP_DATA_POLL.answers[option] / TEMP_DATA_POLL.totalAnswers) *
-              100
-            ).toFixed(1)}
-            %
-          </span>
-        </div>
-      ))}
+      {dataPoll && isAnswered && (
+        <>
+          <h2>Polling Results</h2>
 
-      <button className="card__button" onClick={submitHandler}>
-        Submit Answer
-      </button>
+          {dataPoll.options.map((option) => (
+            <div className="card__poll-result">
+              {option}
+              <span
+                className="percentage-bar"
+                style={{
+                  width: `${dataPoll.percentage[option]}%`,
+                }}
+              ></span>
+              <span className="percentage-value">
+                {(
+                  (dataPoll.answers[option] / dataPoll.totalAnswers) *
+                  100
+                ).toFixed(1)}
+                %
+              </span>
+            </div>
+          ))}
+
+          <button
+            className={
+              btnWait === "Next Question"
+                ? "card__button"
+                : "card__button disableBtn"
+            }
+            onClick={nextQstnHandler}
+          >
+            {btnWait}
+          </button>
+        </>
+      )}
     </div>
   );
 };
